@@ -1,73 +1,283 @@
-# Welcome to your Lovable project
+# ClinIQ
 
-## Project info
+## AI-Powered Clinical PDF → ABDM/NHCX FHIR Bundle Converter
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**FHIR Utility for Providers | Open-Source | Claim Submission Use Case**
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Problem Context
 
-**Use Lovable**
+Hospitals generate **Discharge Summaries** and **Diagnostic Reports** in PDF format.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+For interoperability within:
 
-Changes made via Lovable will be committed automatically to this repo.
+- **ABDM (Ayushman Bharat Digital Mission)**
+- **NHCX (National Health Claims Exchange)**
 
-**Use your preferred IDE**
+these documents must be converted into:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Structured **FHIR R4 resources**
+- Bundles conforming to **NRCeS-defined NHCX claim submission profiles**
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Current Challenges
 
-Follow these steps:
+- Manual FHIR mapping  
+- Custom, document-specific integrations  
+- High onboarding cost for HMIS vendors  
+- Error-prone and non-scalable workflows  
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Objective
 
-# Step 3: Install the necessary dependencies.
-npm i
+Build an **open-source, configuration-driven micro-service** that:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+- Accepts clinical PDFs  
+- Detects HI Type (Discharge Summary / Diagnostic Report)  
+- Extracts structured clinical fields  
+- Converts to NHCX-aligned FHIR Bundles  
+- Validates against defined profiles  
+- Outputs compliant JSON bundles for claim submission  
+
+---
+
+# Our Solution – ClinIQ
+
+ClinIQ is a **frontend-driven AI system powered by Ollama (local LLM)** that converts unstructured PDFs into structured, NHCX-aligned FHIR Bundles.
+
+> ⚡ No separate backend service required  
+> ⚡ Fully local LLM inference using Ollama  
+> ⚡ Production-ready architecture  
+> ⚡ Human-in-the-loop validation  
+
+---
+
+## System Architecture (Current Implementation)
+
+### Architecture Overview
+
+Frontend (React + TypeScript)  
+↓  
+PDF Parsing Layer (Client-side)  
+↓  
+Ollama LLM (Local Model Inference)  
+↓  
+FHIR Mapping Engine (Config-driven)  
+↓  
+NHCX Validation Layer  
+↓  
+Export Structured FHIR Bundle  
+
+---
+
+## Key Features
+
+### ✅ 1. AI-Powered Clinical Extraction (Ollama-Based)
+
+- LLM-driven structured JSON extraction  
+- Prompt-engineered templates  
+- Confidence scoring  
+- Works offline (local model)  
+
+---
+
+### ✅ 2. Automatic HI Type Detection
+
+- Discharge Summary  
+- Diagnostic Report  
+
+---
+
+### ✅ 3. FHIR R4 Bundle Generation
+
+Auto-maps fields to:
+
+- Patient  
+- Encounter  
+- Condition  
+- Observation  
+- DiagnosticReport  
+- Composition  
+
+Features:
+
+- Configuration-driven mappings  
+- Reusable across HMIS systems  
+
+---
+
+### ✅ 4. NHCX Profile-Aware Validation
+
+- Required field verification  
+- Structural validation  
+- Resource reference checks  
+- Error & warning classification  
+- Bundle health score  
+
+---
+
+### ✅ 5. Human-in-the-Loop Review
+
+- Editable extracted fields  
+- Regenerate FHIR bundle  
+- Revalidate  
+- Audit trail of corrections  
+
+---
+
+### ✅ 6. Export
+
+- Download structured FHIR Bundle (JSON)  
+- Ready for Claim Submission workflow  
+
+---
+
+## AI Layer – Ollama (Local LLM)
+
+ClinIQ uses **Ollama** for on-device inference instead of cloud APIs.
+
+### Supported Models
+
+| Model    | Use Case        | RAM Requirement |
+|----------|----------------|----------------|
+| llama3.2 | Fast & balanced | ~8GB          |
+| llama3.1 | Higher accuracy | ~16GB         |
+| phi3     | Lightweight     | <8GB          |
+
+---
+
+# Installation Guide
+
+## 🔵 Windows
+
+1. Download installer from: https://ollama.com  
+2. Install normally  
+3. Open Command Prompt:
+
+```bash
+ollama pull llama3.2
+ollama serve
+```
+
+## 🍎 macOS
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3.2
+ollama serve
+```
+
+## 🐧 Linux
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3.2
+ollama serve
+```
+
+## Verify Installation
+
+```bash
+ollama list
+curl http://localhost:11434/api/tags
+```
+
+## Test Extraction
+
+```bash
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3.2",
+  "prompt": "Extract patient name and DOB from: John Doe, DOB 1990-01-01",
+  "stream": false
+}'
+```
+---
+
+# Project Setup
+
+## 1️⃣ Clone Repository
+
+```bash
+git clone https://github.com/AYUsh-githu/iith-project
+cd iith-project
+```
+
+## 2️⃣ Install Frontend
+
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 3️⃣ Configure AI Endpoint
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+_Ensure:_
 
-**Use GitHub Codespaces**
+1. **Base URL**: http://localhost:11434
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. Model name matches installed model (e.g., llama3.2)
 
-## What technologies are used for this project?
+_If CORS issue:_
 
-This project is built with:
+```bash
+OLLAMA_ORIGINS=* ollama serve
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## Processing Pipeline
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+1. Upload PDF(s)
+2. Extract text
+3. Send structured prompt to Ollama
+4. Receive JSON output
+5. Map to FHIR R4 resources
+6. Build FHIR Bundle
+7. Validate against NHCX profile
+8. Human review 
+9. Export JSON bundle
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## API Interaction (Ollama)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+_ClinIQ uses:_
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```bash
+POST http://localhost:11434/api/generate
+```
+
+with structured JSON prompts for deterministic extraction.
+
+---
+
+## Innovation Highlights
+
+- Local LLM-based structured extraction
+- NHCX claim submission focused
+- Configuration-driven FHIR mapping
+- HMIS reusable component
+- Zero backend dependency
+
+### Compliance Focus
+
+- FHIR R4 standard resources
+- NHCX claim submission profile alignment
+- Required field enforcement
+- Structured error reporting
+
+---
+
+## Impact
+
+- Reduces manual FHIR conversion effort
+- Speeds up NHCX onboarding
+- Enables small hospitals to adopt ABDM workflows
+- Lowers integration cost for HMIS vendors
+
+---
+
+# Conclusion
+
+ClinIQ transforms static clinical PDFs into structured, interoperable FHIR bundles aligned with ABDM and NHCX standards — enabling faster claim submission, reduced manual effort, and true digital health interoperability.
